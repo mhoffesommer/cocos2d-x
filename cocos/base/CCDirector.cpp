@@ -280,10 +280,7 @@ void Director::drawScene()
     /* to avoid flickr, nextScene MUST be here: after tick and before draw.
      * FIXME: Which bug is this one. It seems that it can't be reproduced with v0.9
      */
-    if (_nextScene)
-    {
-        setNextScene();
-    }
+    setNextScene();
 
     pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
     
@@ -1019,6 +1016,9 @@ void Director::purgeDirector()
 
 void Director::setNextScene()
 {
+    if (!_nextScene)
+        return;
+    
     bool runningIsTransition = dynamic_cast<TransitionScene*>(_runningScene) != nullptr;
     bool newIsTransition = dynamic_cast<TransitionScene*>(_nextScene) != nullptr;
 
