@@ -115,6 +115,7 @@ ParticleSystem::ParticleSystem()
 , _opacityModifyRGB(false)
 , _yCoordFlipped(1)
 , _positionType(PositionType::FREE)
+, m_worldStop(nullptr)
 {
     modeA.gravity = Vec2::ZERO;
     modeA.speed = 0;
@@ -155,6 +156,16 @@ ParticleSystem* ParticleSystem::createWithTotalParticles(int numberOfParticles)
     }
     CC_SAFE_DELETE(ret);
     return ret;
+}
+
+Vec2 ParticleSystem::getWorldPosition()
+{
+    AffineTransform t=nodeToParentTransform();
+    
+    for (Node *p=_parent;p!=NULL&&p!=m_worldStop;p=p->getParent())
+        t=AffineTransformConcat(t,p->nodeToParentTransform());
+    
+    return PointApplyAffineTransform(Vec2::ZERO,t);
 }
 
 bool ParticleSystem::init()
@@ -556,7 +567,7 @@ void ParticleSystem::initParticle(tParticle* particle)
     // position
     if (_positionType == PositionType::FREE)
     {
-        particle->startPos = this->convertToWorldSpace(Vec2::ZERO);
+        particle->startPos = getWorldPosition();
     }
     else if (_positionType == PositionType::RELATIVE)
     {
@@ -686,7 +697,7 @@ void ParticleSystem::update(float dt)
     Vec2 currentPosition = Vec2::ZERO;
     if (_positionType == PositionType::FREE)
     {
-        currentPosition = this->convertToWorldSpace(Vec2::ZERO);
+        currentPosition = getWorldPosition();
     }
     else if (_positionType == PositionType::RELATIVE)
     {

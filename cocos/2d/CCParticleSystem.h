@@ -372,6 +372,9 @@ public:
     */
     virtual const BlendFunc &getBlendFunc() const override;
     
+    // set this e.g. to a scale layer
+    void setWorldStopNode(Node *n) { m_worldStop=n; }
+    
 CC_CONSTRUCTOR_ACCESS:
     /**
      * @js ctor
@@ -563,6 +566,10 @@ protected:
      */
     PositionType _positionType;
 
+    Node *m_worldStop;
+
+    Vec2 getWorldPosition();
+    
 private:
     CC_DISALLOW_COPY_AND_ASSIGN(ParticleSystem);
 };
