@@ -99,6 +99,113 @@ public:
 
     }
 
+	// http://www.codeproject.com/Articles/2293/Retrieving-font-name-from-TTF-file
+
+	//This is TTF file header
+	typedef struct _tagTT_OFFSET_TABLE{
+		USHORT uMajorVersion;
+		USHORT uMinorVersion;
+		USHORT uNumOfTables;
+		USHORT uSearchRange;
+		USHORT uEntrySelector;
+		USHORT uRangeShift;
+	}TT_OFFSET_TABLE;
+
+	//Tables in TTF file and there placement and name (tag)
+	typedef struct _tagTT_TABLE_DIRECTORY{
+		char szTag[4]; //table name
+		ULONG uCheckSum; //Check sum
+		ULONG uOffset; //Offset from beginning of file
+		ULONG uLength; //length of the table in bytes
+	}TT_TABLE_DIRECTORY;
+
+	//Header of names table
+	typedef struct _tagTT_NAME_TABLE_HEADER{
+		USHORT uFSelector; //format selector. Always 0
+		USHORT uNRCount; //Name Records count
+		USHORT uStorageOffset; //Offset for strings storage, 
+							   //from start of the table
+	}TT_NAME_TABLE_HEADER;
+
+	//Record in names table
+	typedef struct _tagTT_NAME_RECORD{
+		USHORT uPlatformID;
+		USHORT uEncodingID;
+		USHORT uLanguageID;
+		USHORT uNameID;
+		USHORT uStringLength;
+		USHORT uStringOffset; //from start of storage area
+	}TT_NAME_RECORD;
+
+	#define SWAPWORD(x)		MAKEWORD(HIBYTE(x), LOBYTE(x))
+	#define SWAPLONG(x)		MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
+
+	std::string GetFontNameFromFile(const char *lpszFilePath)
+	{
+		FILE *f=fopen(lpszFilePath,"rb");
+		std::string csRetVal;
+
+		if(f) { 
+			TT_OFFSET_TABLE ttOffsetTable;
+			fread(&ttOffsetTable, sizeof(TT_OFFSET_TABLE),1,f);
+			ttOffsetTable.uNumOfTables = SWAPWORD(ttOffsetTable.uNumOfTables);
+			ttOffsetTable.uMajorVersion = SWAPWORD(ttOffsetTable.uMajorVersion);
+			ttOffsetTable.uMinorVersion = SWAPWORD(ttOffsetTable.uMinorVersion);
+
+			//check is this is a true type font and the version is 1.0
+			if(ttOffsetTable.uMajorVersion != 1 || ttOffsetTable.uMinorVersion != 0)
+				return csRetVal;
+			
+			TT_TABLE_DIRECTORY tblDir;
+			BOOL bFound = FALSE;
+			
+			for(int i=0; i< ttOffsetTable.uNumOfTables; i++){
+				fread(&tblDir, sizeof(TT_TABLE_DIRECTORY),1,f);
+				if(!_strnicmp(tblDir.szTag,"name",4)){
+					bFound = TRUE;
+					tblDir.uLength = SWAPLONG(tblDir.uLength);
+					tblDir.uOffset = SWAPLONG(tblDir.uOffset);
+					break;
+				}
+			}
+			
+			if(bFound){
+				fseek(f,tblDir.uOffset,SEEK_SET);
+				TT_NAME_TABLE_HEADER ttNTHeader;
+				fread(&ttNTHeader, sizeof(TT_NAME_TABLE_HEADER),1,f);
+				ttNTHeader.uNRCount = SWAPWORD(ttNTHeader.uNRCount);
+				ttNTHeader.uStorageOffset = SWAPWORD(ttNTHeader.uStorageOffset);
+				TT_NAME_RECORD ttRecord;
+				bFound = FALSE;
+				
+				for(int i=0; i<ttNTHeader.uNRCount; i++){
+					fread(&ttRecord, sizeof(TT_NAME_RECORD),1,f);
+					ttRecord.uNameID = SWAPWORD(ttRecord.uNameID);
+					if(ttRecord.uNameID == 1){
+						ttRecord.uStringLength = SWAPWORD(ttRecord.uStringLength);
+						ttRecord.uStringOffset = SWAPWORD(ttRecord.uStringOffset);
+						int nPos = ftell(f);
+						fseek(f,tblDir.uOffset + ttRecord.uStringOffset + ttNTHeader.uStorageOffset, SEEK_SET);
+
+						//bug fix: see the post by SimonSays to read more about it
+						std::string csTemp;
+						csTemp.resize(ttRecord.uStringLength);
+						fread(&csTemp[0], ttRecord.uStringLength,1,f);
+						if(ttRecord.uStringLength > 0){
+							csRetVal = csTemp;
+							break;
+						}
+						fseek(f,nPos, SEEK_SET);
+					}
+				}			
+			}
+			fclose(f);
+		}
+		return csRetVal;
+	}
+
+	// end http://www.codeproject.com/Articles/2293/Retrieving-font-name-from-TTF-file
+
     bool setFont(const char * pFontName = nullptr, int nSize = 0)
     {
         bool bRet = false;
@@ -167,6 +274,9 @@ public:
                     if(AddFontResource(pwszBuffer))
                     {
                         SendMessage( _wnd, WM_FONTCHANGE, 0, 0);
+
+						// fix face name (for now)
+						strcpy(tNewFont.lfFaceName,GetFontNameFromFile(fontPath.c_str()).c_str());
                     }						
                     delete [] pwszBuffer;
                     pwszBuffer = nullptr;
@@ -186,6 +296,8 @@ public:
                 _font = hDefFont;
                 break;
             }
+
+            strcpy_s(tNewFont.lfFaceName, LF_FACESIZE, fontName.c_str());
 
             bRet = true;
         } while (0);
