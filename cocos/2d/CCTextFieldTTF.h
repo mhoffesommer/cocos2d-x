@@ -166,6 +166,10 @@ public:
     virtual bool isSecureTextEntry();
 
     virtual void visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t parentFlags) override;
+    
+    // [mh] set to 0 to disable length limits
+    void setMaximumLength(int n) { m_maxLen=n; }
+    int getMaximumLength() const { return m_maxLen; }
 
 protected:
     //////////////////////////////////////////////////////////////////////////
@@ -192,6 +196,7 @@ protected:
 private:
     class LengthStack;
     LengthStack * _lens;
+    int m_maxLen;
 };
 
 // end of input group

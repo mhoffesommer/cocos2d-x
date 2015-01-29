@@ -57,6 +57,7 @@ TextFieldTTF::TextFieldTTF()
 , _placeHolder("")   // prevent Label initWithString assertion
 , _colorText(Color4B::WHITE)
 , _secureTextEntry(false)
+, m_maxLen(0)
 {
     _colorSpaceHolder.r = _colorSpaceHolder.g = _colorSpaceHolder.b = 127;
     _colorSpaceHolder.a = 255;
@@ -201,7 +202,14 @@ void TextFieldTTF::insertText(const char * text, size_t len)
             return;
         }
 
-        _charCount += _calcCharCount(insert.c_str());
+        // limit length?
+        int n=_calcCharCount(insert.c_str());
+        if (m_maxLen&&_charCount+n>m_maxLen)
+        {
+            return;
+        }
+        
+        _charCount += n;
         std::string sText(_inputText);
         sText.append(insert);
         setString(sText);
