@@ -505,7 +505,19 @@ float Value::asFloat() const
 
     if (_type == Type::STRING)
     {
-        return utils::atof(_field.strVal->c_str());
+        // [mh] fix for stupid C# particle editor
+        const char *c=_field.strVal->c_str();
+        if (strchr(c,','))
+        {
+            char help[20];
+            strcpy(help,c);
+            *strchr(help,',')='.';
+            return utils::atof(help);
+        }
+        else
+        {
+            return utils::atof(c);
+        }
     }
 
     if (_type == Type::INTEGER)
@@ -541,7 +553,19 @@ double Value::asDouble() const
 
     if (_type == Type::STRING)
     {
-        return static_cast<double>(utils::atof(_field.strVal->c_str()));
+        // [mh] fix for stupid C# particle editor
+        const char *c=_field.strVal->c_str();
+        if (strchr(c,','))
+        {
+            char help[20];
+            strcpy(help,c);
+            *strchr(help,',')='.';
+            return utils::atof(help);
+        }
+        else
+        {
+            return utils::atof(c);
+        }
     }
 
     if (_type == Type::INTEGER)

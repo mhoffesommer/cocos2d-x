@@ -234,6 +234,10 @@ bool ParticleSystem::initWithDictionary(ValueMap& dictionary, const std::string&
             }
             _blendFunc.dst = dictionary["blendFuncDestination"].asInt();
 
+            // [mh] particle editor fix
+            if (dictionary["blendAdditive"].asInt())
+                setBlendAdditive(true);
+            
             // color
             _startColor.r = dictionary["startColorRed"].asFloat();
             _startColor.g = dictionary["startColorGreen"].asFloat();
