@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "base/utlist.h"
 #include "base/ccCArray.h"
 #include "base/CCScriptSupport.h"
+#include "CCApplication.h"
 
 NS_CC_BEGIN
 
@@ -832,6 +833,8 @@ void Scheduler::update(float dt)
 {
     _updateHashLocked = true;
 
+    Application::getInstance()->update(dt);
+    
     if (_timeScale != 1.0f)
     {
         dt *= _timeScale;

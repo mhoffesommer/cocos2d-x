@@ -142,6 +142,9 @@ public:
      * @lua NA
      */
     virtual bool openURL(const std::string &url) = 0;
+    
+    // called once per frame
+    virtual void update(float dt) = 0;
 };
 
 // end of platform group
