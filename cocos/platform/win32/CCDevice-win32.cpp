@@ -312,12 +312,12 @@ public:
             CC_BREAK_IF(! pszText || nLen <= 0);
 
             RECT rc = {0, 0, 0, 0};
-            DWORD dwCalcFmt = DT_CALCRECT;
+			DWORD dwCalcFmt = DT_CALCRECT | DT_NOPREFIX;
 
             if (nWidthLimit > 0)
             {
                 rc.right = nWidthLimit;
-                dwCalcFmt |= DT_WORDBREAK | DT_NOPREFIX
+                dwCalcFmt |= DT_WORDBREAK 
                     | (dwFmt & DT_CENTER)
                     | (dwFmt & DT_RIGHT);
             }
