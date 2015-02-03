@@ -81,6 +81,7 @@ public:
     /** returns whether or not the item is selected */
     virtual bool isSelected() const;
 
+	virtual void onEnter() override;
 	virtual void onExit() override;
 
     /** set the callback to the menu item

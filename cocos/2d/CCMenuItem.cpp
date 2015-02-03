@@ -82,7 +82,6 @@ MenuItem* MenuItem::create( const ccMenuCallback& callback)
 bool MenuItem::initWithTarget(cocos2d::Ref *target, SEL_MenuHandler selector )
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	return initWithCallback( std::bind(selector,target, std::placeholders::_1) );
 }
 
@@ -97,6 +96,12 @@ bool MenuItem::initWithCallback(const ccMenuCallback& callback)
 
 MenuItem::~MenuItem()
 {
+}
+
+void MenuItem::onEnter()
+{
+	Node::onEnter();
+	CC_SAFE_RETAIN(_target);
 }
 
 void MenuItem::onExit()
