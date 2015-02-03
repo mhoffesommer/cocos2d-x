@@ -340,4 +340,8 @@ To enable set it to a value different than 0. Disabled by default.
 # define CC_ALLOCATOR_GLOBAL_NEW_DELETE cocos2d::allocator::AllocatorStrategyGlobalSmallBlock
 #endif
 
+#ifdef _DEBUG
+#	define COCOS2D_DEBUG 1
+#endif
+
 #endif // __CCCONFIG_H__
