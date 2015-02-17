@@ -31,6 +31,9 @@
 
 #import "math/CCGeometry.h"
 #import "CCDirectorCaller-ios.h"
+#import "cocos2d.h"
+#import "CCGLView.h"
+#import "platform/ios/CCEAGLView-ios.h"
 
 NS_CC_BEGIN
 
@@ -180,8 +183,11 @@ bool Application::openURL(const std::string &url)
     return [[UIApplication sharedApplication] openURL:nsUrl];
 }
 
-void Application::applicationScreenSizeChanged(int newWidth, int newHeight) {
-
+void Application::applicationScreenSizeChanged(int w, int h)
+{
+    auto glview=Director::getInstance()->getOpenGLView();
+    glview->setFrameSize((float)w,(float)h);
+    glview->setDesignResolutionSize((float)w,(float)h,ResolutionPolicy::SHOW_ALL);
 }
 
 NS_CC_END
