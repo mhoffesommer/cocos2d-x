@@ -145,6 +145,8 @@ public:
     
     // called once per frame
     virtual void update(float dt) {}
+
+	virtual void applicationScreenSizeChanged(int newWidth,int newHeight) {}
 };
 
 // end of platform group
