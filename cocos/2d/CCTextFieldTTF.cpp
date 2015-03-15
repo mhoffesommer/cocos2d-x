@@ -58,6 +58,8 @@ TextFieldTTF::TextFieldTTF()
 , _colorText(Color4B::WHITE)
 , _secureTextEntry(false)
 , m_maxLen(0)
+, m_attached(false)
+, m_cursor(false)
 {
     _colorSpaceHolder.r = _colorSpaceHolder.g = _colorSpaceHolder.b = 127;
     _colorSpaceHolder.a = 255;
@@ -182,7 +184,41 @@ bool TextFieldTTF::canDetachWithIME()
     return (_delegate) ? (! _delegate->onTextFieldDetachWithIME(this)) : true;
 }
 
-void TextFieldTTF::insertText(const char * text, size_t len)
+void TextFieldTTF::didAttachWithIME()
+{
+	m_attached=true;
+	m_cursor=false;
+	schedule(schedule_selector(TextFieldTTF::updateWhileAttached),0.1f);
+}
+
+void TextFieldTTF::didDetachWithIME()
+{
+	unschedule(schedule_selector(TextFieldTTF::updateWhileAttached));
+	m_attached=false;
+	updateWhileAttached(0);
+}
+
+void TextFieldTTF::updateWhileAttached(float dt)
+{
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+	// create simple blinking cursor on windows
+	if (!m_attached)
+	{
+		setString(_inputText);
+	}
+	else
+	{
+		m_cursor=!m_cursor;
+
+		std::string help=_inputText;
+		if (m_cursor)
+			help+="|";
+		Label::setString(help.c_str());
+	}
+#endif
+}
+
+void TextFieldTTF::insertText(const char * text,size_t len)
 {
     std::string insert(text, len);
 

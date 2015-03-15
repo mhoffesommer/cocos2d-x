@@ -181,6 +181,9 @@ protected:
     virtual void insertText(const char * text, size_t len) override;
     virtual void deleteBackward() override;
     virtual const std::string& getContentText() override;
+	virtual void didAttachWithIME();
+	virtual void didDetachWithIME();
+	void updateWhileAttached(float dt);
 
     TextFieldDelegate * _delegate;
     int _charCount;
@@ -197,6 +200,8 @@ private:
     class LengthStack;
     LengthStack * _lens;
     int m_maxLen;
+	bool m_attached;
+	bool m_cursor;
 };
 
 // end of input group
