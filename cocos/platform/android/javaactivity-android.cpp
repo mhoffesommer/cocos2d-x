@@ -101,7 +101,11 @@ jintArray Java_org_cocos2dx_lib_Cocos2dxActivity_getGLContextAttrs(JNIEnv*  env,
 
 void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnSurfaceChanged(JNIEnv*  env, jobject thiz, jint w, jint h)
 {
-    cocos2d::Application::getInstance()->applicationScreenSizeChanged(w, h);
+	auto glview=Director::getInstance()->getOpenGLView();
+	glview->setFrameSize((float)w,(float)h);
+	glview->setDesignResolutionSize((float)w,(float)h,ResolutionPolicy::SHOW_ALL);
+
+	cocos2d::Application::getInstance()->applicationScreenSizeChanged(w,h);
 }
 
 }
