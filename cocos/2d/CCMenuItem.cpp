@@ -165,7 +165,6 @@ bool MenuItem::isSelected() const
 void MenuItem::setTarget(Ref *target, SEL_MenuHandler selector)
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	setCallback( std::bind( selector, target, std::placeholders::_1) );
 }
 
@@ -229,7 +228,6 @@ MenuItemLabel* MenuItemLabel::create(Node *label)
 bool MenuItemLabel::initWithLabel(Node* label, Ref* target, SEL_MenuHandler selector)
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	return initWithLabel(label, std::bind(selector,target, std::placeholders::_1) );
 }
 
@@ -351,7 +349,6 @@ MenuItemAtlasFont * MenuItemAtlasFont::create(const std::string& value, const st
 bool MenuItemAtlasFont::initWithString(const std::string& value, const std::string& charMapFile, int itemWidth, int itemHeight, char startCharMap, Ref* target, SEL_MenuHandler selector)
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	return initWithString(value, charMapFile, itemWidth, itemHeight, startCharMap, std::bind(selector,target, std::placeholders::_1) );
 }
 
@@ -437,7 +434,6 @@ bool MenuItemFont::initWithString(const std::string& value, Ref* target, SEL_Men
     CCASSERT( !value.empty(), "Value length must be greater than 0");
 
 	_target = target;
-    CC_SAFE_RETAIN(target);
 	return initWithString(value, std::bind(selector,target, std::placeholders::_1) );
 }
 
@@ -586,7 +582,6 @@ MenuItemSprite * MenuItemSprite::create(Node *normalSprite, Node *selectedSprite
 bool MenuItemSprite::initWithNormalSprite(Node* normalSprite, Node* selectedSprite, Node* disabledSprite, Ref* target, SEL_MenuHandler selector)
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	return initWithNormalSprite(normalSprite, selectedSprite, disabledSprite, std::bind(selector,target, std::placeholders::_1) );
 }
 
@@ -766,7 +761,6 @@ MenuItemImage * MenuItemImage::create(const std::string& normalImage, const std:
 bool MenuItemImage::initWithNormalImage(const std::string& normalImage, const std::string& selectedImage, const std::string& disabledImage, Ref* target, SEL_MenuHandler selector)
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	return initWithNormalImage(normalImage, selectedImage, disabledImage, std::bind(selector,target, std::placeholders::_1) );
 }
 bool MenuItemImage::initWithNormalImage(const std::string& normalImage, const std::string& selectedImage, const std::string& disabledImage, const ccMenuCallback& callback)
@@ -883,7 +877,6 @@ MenuItemToggle * MenuItemToggle::create()
 bool MenuItemToggle::initWithTarget(Ref* target, SEL_MenuHandler selector, MenuItem* item, va_list args)
 {
 	_target = target;
-	CC_SAFE_RETAIN(_target);
 	return initWithCallback(std::bind( selector, target, std::placeholders::_1), item, args);
 }
 
